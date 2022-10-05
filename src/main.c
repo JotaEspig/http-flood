@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 // Prints the banner of the tool
 void print_banner(void) {
     printf( "= = = = = = = = = = = = = = = = = = = =\n"
@@ -9,10 +10,12 @@ void print_banner(void) {
             "= = = = = = = = = = = = = = = = = = = =\n");
 }
 
+
 // Prints the help string
 void print_help(void) {
     printf("Usage: http-flood <host> [port] [number of attacks]\n"); // TODO improve help string
 }
+
 
 int main(int argc, char *argv[]) {
     char *host;
