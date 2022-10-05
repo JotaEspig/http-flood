@@ -1,2 +1,2 @@
 make
-./bin/http-flood
+./bin/http-flood $1 $2 $3
