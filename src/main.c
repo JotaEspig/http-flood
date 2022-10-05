@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 // Prints the banner of the tool
 void print_banner(void) {
@@ -13,15 +14,28 @@ void print_help(void) {
     printf("Usage: http-flood <host> [port] [number of attacks]\n"); // TODO improve help string
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char *argv[]) {
+    char *host;
     int port, num_attacks;
     port = 80;
     num_attacks = 100000000;
-    if (argc < 2) {
+    if (argc <= 1) {
         print_help();
         exit(1);
     }
-    printf("host: %s\n", argv[1]);
+
+    host = (char *)malloc(sizeof(argv[1]));
+    strcpy(host, argv[1]);
+
+    if (argc > 2) {
+        port = atoi(argv[2]);
+    }
+    if (argc > 3) {
+        num_attacks = atoi(argv[3]);
+    }
+
+    printf("host: %s\nport: %d\nNumber of attacks: %d\n", host, port, num_attacks);
     print_banner();
+    free((void *)host);
     return 0;
 }
