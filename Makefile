@@ -2,7 +2,7 @@
 
 # tool macros
 CC ?= gcc
-CFLAGS := 
+CFLAGS := -pthread
 
 # path macros
 BIN_PATH := bin
