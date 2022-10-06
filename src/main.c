@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "attacker/attacker.h"
+
 
 // Prints the banner of the tool
 void print_banner(void) {
@@ -37,8 +39,11 @@ int main(int argc, char *argv[]) {
         num_attacks = atoi(argv[3]);
     }
 
-    printf("host: %s\nport: %d\nNumber of attacks: %d\n", host, port, num_attacks);
     print_banner();
+    printf("host: %s\nport: %d\nNumber of attacks: %d\n", host, port, num_attacks);
+
+    attack(host, port);
+
     free((void *)host);
     return 0;
 }
