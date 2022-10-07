@@ -10,7 +10,13 @@
 #include "attacker/attacker.h"
 
 #define ATTACKS_PER_THREAD 100
-#define BUFFER_SIZE 100
+
+#define LIGHT_RED "\e[1;31m"
+#define LIGHT_BLUE "\e[1;34m"
+#define CYAN "\e[0;36m"
+#define LIGHT_GREEN "\e[1;32m"
+#define YELLOW "\e[0;33m"
+#define NO_COLOR "\e[0m"
 
 
 // struct that contains values to be used in thread function (run_100_attacks)
@@ -24,15 +30,17 @@ struct thread_args {
 
 // Prints the banner of the tool
 void print_banner(void) {
-    printf( "= = = = = = = = = = = = = = = = = = = =\n"
-            "              HTTP Flood               \n"
-            "= = = = = = = = = = = = = = = = = = = =\n");
+    printf( "%s= = = = = = = = = = = = = = = = = = = =\n"
+            "%s              HTTP Flood               \n"
+            "%s= = = = = = = = = = = = = = = = = = = =\n"
+            "%s", CYAN, LIGHT_RED, CYAN, NO_COLOR);
 }
 
 
 // Prints the help string
 void print_help(void) {
-    printf("Usage: http-flood <host> [port] [number of attacks]\n"); // TODO improve help string
+    printf("Usage: http-flood <host> [port] [number of attacks]\n"); 
+    // TODO improve help string
 }
 
 
@@ -111,7 +119,7 @@ int main(int argc, char *argv[]) {
         num_attacks = atoll(argv[3]);
     }
     if (num_attacks < 100) {
-        printf("amount of attacks must be at least 100\n");
+        printf("Number of attacks must be at least 100\n");
         exit(1);
     }
     if (argc > 4) {
@@ -133,10 +141,14 @@ int main(int argc, char *argv[]) {
     ip = inet_ntoa(*((struct in_addr*) host_entry->h_addr_list[0]));
 
     print_banner();
-    printf("host: %s\nip: %s\nport: %d\nNumber of attacks: %ld\n",
-        host, ip, port, num_attacks);
+    printf( "host: %s%s%s\n"
+            "ip: %s%s%s\n"
+            "port: %s%d%s\n"
+            "Number of attacks: %s%ld%s\n",
+            LIGHT_GREEN, host, NO_COLOR, LIGHT_GREEN, ip, NO_COLOR, 
+            YELLOW, port, NO_COLOR, LIGHT_RED, num_attacks, NO_COLOR);
 
-    printf("attacking...\n");
+    printf("Attacking...\n");
     usleep(1500 * 1000); // wait 1500 milliseconds to run
 
     // set up thread_args
