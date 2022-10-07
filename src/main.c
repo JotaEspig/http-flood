@@ -58,14 +58,16 @@ char *read_file(char *filename) {
     file_size = ftell(file);  // returns the position
     fseek(file, 0, SEEK_SET); // set the stream position to the beginning of the file
 
-    string = (char *) malloc(sizeof(char) * (file_size+1));
+    string = (char *) malloc(sizeof(char) * (file_size+3)); // +3 to add \n\n and \0
     i = 0;
     // Read all the characters from the file
     while ((c = fgetc(file)) != EOF) {
         string[i] = c;
         i++;
     }
-    string[i] = '\0';
+    string[i] = '\n';
+    string[i+1] = '\n';
+    string[i+2] = '\0';
 
     fclose(file);
     return string;
@@ -102,6 +104,7 @@ int main(int argc, char *argv[]) {
     // default values
     port = 80;
     num_attacks = 100000000;
+    payload = NULL;
 
     // if user doens't specifies host
     if (argc <= 1) {
