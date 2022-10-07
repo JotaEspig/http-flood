@@ -9,12 +9,18 @@
 #include "attacker.h"
 
 
+// Generates the payload to send to the server
+static char *generate_payload() {
+    // TODO Make payload be a random path instead of just "attack"
+    return "GET /attack HTTP/1.1\nHost: \n\n";
+}
+
+
 // Sends the payload
 static void send_payload(int sock_fd, char *payload) {
     if (payload == NULL) {
-        payload = "GET /attack HTTP/1.1\nHost: 127.0.0.1\n\n";
+        payload = generate_payload();
     }
-    // TODO Make payload be a random path instead of just "attack"
     write(sock_fd, payload, strlen(payload));
 }
 
