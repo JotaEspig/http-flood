@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -9,15 +10,17 @@
 
 
 // Sends the payload
-static void send_payload(int sock_fd) {
-    char payload[] = "GET /attack HTTP/1.1\nHost: \n\n";
+static void send_payload(int sock_fd, char *payload) {
+    if (payload == NULL) {
+        payload = "GET /attack HTTP/1.1\nHost: 127.0.0.1\n\n";
+    }
     // TODO Make payload be a random path instead of just "attack"
-    write(sock_fd, payload, sizeof(payload));
+    write(sock_fd, payload, strlen(payload));
 }
 
 
 // Does the request to the web server
-void attack(char *host, char *ip, int16_t port) {
+void attack(char *host, char *ip, int16_t port, char *payload) {
     int sock_fd, i;
     struct sockaddr_in target_addr;
 
@@ -32,7 +35,7 @@ void attack(char *host, char *ip, int16_t port) {
         return;
     }
 
-    send_payload(sock_fd);
+    send_payload(sock_fd, payload);
 
     shutdown(sock_fd, SHUT_RDWR);
     close(sock_fd);
