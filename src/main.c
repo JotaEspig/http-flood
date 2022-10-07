@@ -5,6 +5,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <pthread.h>
+#include <sys/time.h>
 
 #include "attacker/attacker.h"
 
@@ -46,6 +47,9 @@ void *run_100_attacks(void *args) {
 
 
 int main(int argc, char *argv[]) {
+    struct timeval start, end;
+    gettimeofday(&start, NULL);
+
     char *host, *ip;
     int port, host_length;
     size_t i, num_attacks;
@@ -122,5 +126,8 @@ int main(int argc, char *argv[]) {
     }
 
     free((void *) all_threads_id);
+
+    gettimeofday(&end, NULL);
+    printf("Attack has finished in %ld seconds\n", (end.tv_sec - start.tv_sec));
     return 0;
 }
