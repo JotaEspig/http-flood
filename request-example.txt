@@ -1,2 +1,6 @@
-GET /exame/get_image?hash=c4ca4238a0b923820dcc509a6f75849b HTTP/1.1
+POST /login HTTP/1.1
 Host: 
+Content-Type: application/json
+Content-Length: 44
+
+{"username": "admin", "password": "admin"}
