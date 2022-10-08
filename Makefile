@@ -10,13 +10,11 @@ SRC_PATH := src
 
 # compile macros
 TARGET_NAME := http-flood
-ifeq ($(OS),Windows_NT)
-	TARGET_NAME := $(addsuffix .exe,$(TARGET_NAME))
-endif
 TARGET := $(BIN_PATH)/$(TARGET_NAME)
 
 # src files & obj files
-SRC := $(shell find src/ -type f -name '*.c')
+SRC := 	src/main.c src/attacker/attacker.c \
+		src/C-Thread-Pool/thpool.c
 
 # clean files list
 CLEAN_LIST := $(TARGET)
@@ -40,8 +38,3 @@ all: $(TARGET)
 clean:
 	@echo CLEAN $(CLEAN_LIST)
 	@rm -f $(CLEAN_LIST)
-
-# Print the source files and object files
-print:
-	echo $(SRC)
-	echo $(OBJ)
