@@ -28,9 +28,8 @@ void print_help(void) {
 char *read_file(char *filename) {
     FILE *file;
     int file_size;
-    char *string;
-    char c;
-    int i;
+    size_t i;
+    char c, *content;
 
     file = fopen(filename, "r");
     if (file == NULL) return NULL;
@@ -39,19 +38,19 @@ char *read_file(char *filename) {
     file_size = ftell(file);  // returns the position
     fseek(file, 0, SEEK_SET); // set the stream position to the beginning of the file
 
-    string = (char *) malloc(sizeof(char) * (file_size+3)); // +3 to add \n\n and \0
+    content = (char *) malloc(sizeof(char) * (file_size+3)); // +3 to add \n\n and \0
     i = 0;
     // Read all the characters from the file
     while ((c = fgetc(file)) != EOF) {
-        string[i] = c;
+        content[i] = c;
         i++;
     }
-    string[i] = '\n';
-    string[i+1] = '\n';
-    string[i+2] = '\0';
+    content[i] = '\n';
+    content[i+1] = '\n';
+    content[i+2] = '\0';
 
     fclose(file);
-    return string;
+    return content;
 }
 
 
