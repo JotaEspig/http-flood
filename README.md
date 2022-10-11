@@ -1,8 +1,12 @@
 # HTTP Flood
 HTTP Flood is a tool to do http flood attacks made in C. The idea of this project came from my other personal project, [SIGMA](https://github.com/JotaEspig/sigma), that's a website. The reason why I making this tool is to test my web application and to improve my knowledge about C programming and cyber security.
+
+## TODO
+- [ ] Make it work on HTTPS protocol
+- [ ] Improve UX (help string, information shown on terminal)
+
 ## Installation
 **ONLY RUNS ON LINUX**
-
 
 ## Usage
 **ONLY RUNS ON LINUX**
