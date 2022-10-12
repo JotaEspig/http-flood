@@ -13,8 +13,7 @@ TARGET_NAME := http-flood
 TARGET := $(BIN_PATH)/$(TARGET_NAME)
 
 # src files & obj files
-SRC := 	src/main.c src/attacker/attacker.c \
-		src/C-Thread-Pool/thpool.c
+SRC := 	src/main.c src/attacker/attacker.c
 
 # clean files list
 CLEAN_LIST := $(TARGET)
