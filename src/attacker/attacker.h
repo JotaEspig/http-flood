@@ -1,7 +1,7 @@
 #ifndef ATTACKER
 #define ATTACKER
 
-#define NUM_THREADS 100
+#define NUM_THREADS 10000
 
 
 // struct that contains values to be used in thread function (run_100_attacks)
