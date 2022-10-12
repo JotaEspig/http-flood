@@ -109,14 +109,20 @@ int main(int argc, char *argv[]) {
     printf( "host: %s%s%s\n"
             "ip: %s%s%s\n"
             "port: %s%d%s\n"
-            "Number of attacks: %s%ld%s\n",
+            "Number of attacks: %s%ld%s\n"
+            "Threads: %s%d%s\n"
+            "Requests per thread: %s%ld%s\n",
             LIGHT_GREEN, t_args.host, NO_COLOR, LIGHT_GREEN, t_args.ip, NO_COLOR,
-            YELLOW, t_args.port, NO_COLOR, LIGHT_RED, num_attacks, NO_COLOR);
+            YELLOW, t_args.port, NO_COLOR, LIGHT_RED, num_attacks, NO_COLOR,
+            LIGHT_BLUE, NUM_THREADS, NO_COLOR,
+            LIGHT_BLUE, t_args.requests_per_thread, NO_COLOR);
 
     printf("Attacking...\n");
     usleep(1500 * 1000); // wait 1500 milliseconds to run
 
     run_threads(t_args);
+
+    printf("=======================================\n");
 
     gettimeofday(&end, NULL);
     printf("Attack has finished in %ld seconds\n", (end.tv_sec - start.tv_sec));

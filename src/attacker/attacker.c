@@ -27,9 +27,13 @@ static void send_payload(int sock_fd, char *payload) {
     write(sock_fd, payload, strlen(payload));
 }
 
+static void attack_with_ssl(char *host, char *ip, u_int16_t port, char *payload) {
+
+}
+
 
 // Does the request to the web server
-static void attack(char *host, char *ip, int16_t port, char *payload) {
+static void attack(char *host, char *ip, uint16_t port, char *payload) {
     int sock_fd, i;
     struct sockaddr_in target_addr;
 
@@ -51,7 +55,7 @@ static void attack(char *host, char *ip, int16_t port, char *payload) {
 }
 
 
-// Thread function that runs attacks
+// Thread function that runs the attacks against some target
 static void *run_attacks(void *args) {
     size_t i;
     struct thread_args *t_args;
@@ -79,11 +83,19 @@ void run_threads(struct thread_args t_args) {
         all_threads_id[i] = t_id; // append the thread id
         usleep(10 * 1000); // wait 10 milliseconds to run the next thread
     }
-    printf("\n");
+    printf("\nWaiting threads finish...\n");
 
+    printf("\rcompleted threads: %s%d%s",
+            LIGHT_BLUE, 0, NO_COLOR);
+    fflush(stdout);
     // wait for threads to finish
     for (i = 0; i < NUM_THREADS; i++) {
         t_id = all_threads_id[i];
         pthread_join(t_id, NULL);
+
+        printf("\rcompleted threads: %s%ld%s",
+            LIGHT_BLUE, i+1, NO_COLOR);
+        fflush(stdout);
     }
+    printf("\n");
 }
