@@ -1,7 +1,9 @@
 #ifndef ATTACKER
 #define ATTACKER
 
-#define NUM_THREADS 10000
+#define NUM_THREADS 1000
+
+#include <stdlib.h>
 
 
 // struct that contains values to be used in thread function (run_100_attacks)
